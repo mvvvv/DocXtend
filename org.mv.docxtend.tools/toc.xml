@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="DocXtend User Guide">
+	<topic label="Getting started"  href="html/docxtend.html"> 
+		<topic label="Introduction" href="html/xtendtree.html"/> 
+		<topic label="Tutorial"  href="html/tutodocxtend.html">
+			<topic label="Create a builder" href="html/tutodocxtend.html#Part1"/>
+			<topic label="Use a builder" href="html/tutodocxtend.html#Part2"/>
+			<topic label="Keep constructor signatures" href="html/tutodocxtend.html#Part3"/>
+			<topic label="Use a static builder" href="html/tutodocxtend.html#Part4"/>
+		</topic>
+	</topic>
+	<topic label="The E4/SWT example"  href="html/e4SWTexample.html"/> 
+</toc>

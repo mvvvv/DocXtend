@@ -1,0 +1,134 @@
+/*******************************************************************************
+* Copyright (c) 2013 M. Vidal (http://www.matthieu-vidal.com) and others.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*******************************************************************************/
+package org.mv.docxtend.tools.wizards
+
+import org.eclipse.core.runtime.CoreException
+import org.eclipse.core.runtime.IProgressMonitor
+import org.eclipse.core.runtime.IStatus
+import org.eclipse.jdt.core.IType
+import org.eclipse.jdt.ui.wizards.NewTypeWizardPage
+import org.eclipse.jface.viewers.IStructuredSelection
+import org.eclipse.jface.wizard.Wizard
+import org.eclipse.swt.SWT
+import org.eclipse.swt.widgets.Button
+import org.eclipse.swt.widgets.Composite
+import org.eclipse.ui.INewWizard
+import org.eclipse.ui.IWorkbench
+import org.mv.docxtend.eclipse.swt.SwtBuilder
+
+/**WizardPage creating a new builder from it's root  */
+class NewXtendTreeBuilderPage extends NewTypeWizardPage {
+
+	private var Button fCreateStubs
+
+	new() {
+		super(true, "NewXtendTreeBuilderPage")
+
+	}
+
+	/**
+     * The wizard managing this wizard page must call this method
+     * during initialization with a corresponding selection.
+     */
+	def init(IStructuredSelection selection) {
+		val jelem = getInitialJavaElement(selection)
+		initContainerPage(jelem)
+		initTypePage(jelem)
+		doStatusUpdate()
+	}
+
+	private def doStatusUpdate() {
+
+		// define the components for which a status is desired
+		var IStatus statusP
+		if (enclosingTypeSelected)
+			statusP = fEnclosingTypeStatus
+		else
+			statusP = fPackageStatus
+
+		val status = <IStatus>newArrayList(#[fContainerStatus, statusP, fTypeNameStatus])
+
+		updateStatus(status);
+	}
+
+	override createControl(Composite parent) {
+		extension val swtBuilder = new SwtBuilder
+
+		val nColumns = 4;
+
+		initializeDialogUnits(parent);
+		parent => [
+			_Composite(SWT::NONE) [
+				_GridLayout()[numColumns = nColumns]
+				// Create the standard input fields
+				createContainerControls(nColumns);
+				createPackageControls(nColumns);
+				createSeparator(nColumns);
+				createTypeNameControls(nColumns);
+				createSuperClassControls(nColumns);
+				createSuperInterfacesControls(nColumns)
+				// Create the checkbox controlling whether we want stubs
+				fCreateStubs = _Button(SWT::CHECK) [
+					text = "usingConstructors"
+					_GridData()[horizontalSpan = nColumns]
+				]
+				setControl
+			]
+		]
+
+		// Initialize the super type field and mark it as read-only
+		//setSuperClass("java.lang.Object", false);
+		}
+
+		override createTypeMembers(IType newType, NewTypeWizardPage.ImportsManager imports, IProgressMonitor monitor) throws CoreException {
+			if (fCreateStubs.selection) {
+				val setUpMathod = "def setUp() {}";
+				newType.createMethod(setUpMathod, null, false, null);
+
+				val tearDownMathod = "public void tearDown() {}";
+				newType.createMethod(tearDownMathod, null, false, null);
+			}
+		}
+
+	}
+
+	/**Wizard creating a new builder from it's root
+ * @see @NewXtendTreeBuilderPage
+ */
+	class NewXtendTreeBuilder extends Wizard implements INewWizard {
+
+		private var IWorkbench workbench
+		private var IStructuredSelection selection
+		private var NewXtendTreeBuilderPage mainPage
+
+		new() {
+			mainPage = new NewXtendTreeBuilderPage()
+			setWindowTitle("New Xtend class with @XtendTree")
+		}
+
+		override init(IWorkbench workbench, IStructuredSelection selection) {
+			this.workbench = workbench;
+			this.selection = selection;
+
+			mainPage.init(selection)
+		}
+
+		override addPages() {
+			addPage(mainPage);
+		}
+
+		override boolean canFinish() {
+			return true
+		}
+
+		override boolean performFinish() {
+				return true;
+		}
+	
+}
+	

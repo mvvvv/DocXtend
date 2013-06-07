@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- *******************************************************************************
+* Copyright (c) 2013 M. Vidal (http://www.matthieu-vidal.com) and others.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+******************************************************************************* -->
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Tutorial</title>
+	<link  href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" rel="stylesheet" type="text/css">
+	<style type="text/css">	em  {color:darkred;} strong {color:blue;} i {color:darkgrey} </style>
+	
+</head>
+
+<body>
+<h2>Tutorial</h2>
+<h3 id="Part1">1 - Create a Builder</h3>
+<br/>
+Create a <b>new java project</b>.
+
+<br/><br/>
+
+Regarding whether or not the project is a plugin:
+	<ul>
+		<li>The project is a plugin : open <b>MANIFEST.MF &raquo; Dependencies</b> then <b>add plugin <strong>org.mv.docxtend</strong></b>.</li>
+	
+		<li>The project is not a plugin : add <strong>DocXtend annotations library</strong> to the project. i.e: Using the package view : 
+	<b>right click on the project &raquo; Build Path &raquo; add Libraries...</b></li>
+	</ul>
+	
+<br/><br/>
+Create a <b>new Xtend Class</b> called <strong>SwingMenuBuilder</strong>:
+<br/><br/>
+<p class="code">  
+	<i>@XtendTree</i><br/>
+	<em>class </em>SwingMenuBuilder {<br/>
+	<br/>
+	 &nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts=<strong>"add:_JMenu _JMenuItem"</strong>) 
+	 <em>protected def </em>_JMenuBar(){<em>new</em> JMenuBar}<br/>
+	 &nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts =<strong>"add :_JMenuItem"</strong>) 
+	 <em>protected def </em>  _JMenu(){<em>new</em> JMenu}<br/>
+	 &nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> 
+	 <em>protected def</em>  _JMenuItem(){<em>new</em> JMenuItem}
+	<br/>	
+	}
+</p>
+<p>
+	This Class defines two containers (JMenuBar & JMenu) and two inserts (_JMenu & _JMenuItem).<br/>
+	Please verify, with the outline view (ctrl+o), that three public methods are created by the annotation processor:
+	One for _JMenu and two for _JMenuItem.<br/>
+	_JMenuBar is not duplicated as it's contained nowhere inside this class.
+</p>
+
+<br/><br/>
+Create a <b>new Xtend Class</b> called <strong>SwingBuilder</strong> (In the same compilation unit than SwingMenuBuilder if you want):
+
+<br/><br/>
+<p class="code">  
+	<i>@XtendTree</i>(useInsertsFrom=#[<em>typeof</em>(SwingMenuBuilder)])<br/>
+	<em>class </em>SwingBuilder {<br/>
+	<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts=#[<br/><strong>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"add : _JFrame _JButton _JLabel ",<br/>    
+ 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"setLayout : _BorderLayout _FlowLayout ",<br/> 	
+ 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"setJMenuBar : _JMenuBar"</strong>])<br/> 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def </em>_JFrame(){<em>new</em> JFrame}<br/><br/>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i>  
+	<em>protected def </em>  _JButton(){<em>new</em> JButton}<br/>
+
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> 
+	<em>protected def</em>  _JLabel(){<em>new</em> JLabel}<br/><br/>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;//----The Layouts :<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> 
+	<em>protected def </em>  _FlowLayout(){<em>new</em> FlowLayout}<br/>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> 
+	<em>protected def</em>  _BorderLayout(){<em>new</em> BorderLayout}
+	<br/>
+		
+	}
+</p>
+<p>
+	This Class defines only one container (JFrame) and five inserts (all are inserts). furthermore, three inserts are usable from
+	<strong>SwingMenuBuilder</strong> but only one (_JMenuBar) is referenced by JFrame.<br>
+	Please verify, with the outline view (ctrl+o), that all these five protected methods are duplicated by one public method each.
+	Verify too, that the public method JMenuBar is present with JFrame as first parameter type. 
+</p>
+
+<br/>
+<hr>
+<br/>
+<h3 id="Part2">2 - Use a Builder</h3>
+<br/>
+Create a <b>new xtend class</b> called <strong>SwingFrame</strong> extending JFrame:
+<br/><br/>
+<p class="code">  
+	<em>class </em>SwingFrame <em>extends</em> JFrame {<br/>
+	<br/>	
+		
+	&nbsp;&nbsp;&nbsp;
+	<em>new</em>() {<br/>			
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<em>extension val</em> b = <em>new</em> SwingBuilder<br/>	
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		this => [<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			title = <strong>"A test of an AwtBuilder"</strong><br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			setSize(400, 100)<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_FlowLayout[]<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_JLabel	[text = <strong>"Do not click this button : "</strong>]<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_JButton[text = <strong>"click me please !!"</strong><br/>	
+					 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					 addActionListener([this.title = <strong>"Why ???!!!"</strong>])	]<br/>	
+			<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_JMenuBar[ <em>extension val</em> mb = <em>new</em> SwingMenuBuilder<br/>	
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				_JMenu [text =<strong>"xtend is good"</strong><br/>	
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					_JMenuItem [text =<strong>"boum"</strong>]<br/>	
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					_JMenuItem [text =<strong>"bam"</strong> ]		]<br/>	
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				_JMenu [text =<strong>"try it"</strong><br/>	
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					_JMenuItem [text =<strong>"poum"</strong>]<br/>	
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					_JMenuItem [text =<strong>"pam"</strong>	]  		]<br/>	
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				_JMenuItem [text = "?"</strong>]<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			]<br/>	
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		]<br/>	
+	&nbsp;&nbsp;&nbsp;
+	}<br/>	
+	<br/>	
+	&nbsp;&nbsp;&nbsp;
+	<em>def static void</em> main(String[] args) {<br/>	
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<em>new</em> SwingFrame=>[<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			setDefaultCloseOperation(JFrame::EXIT_ON_CLOSE)<br/>	
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			setVisible(true)<br/>	
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		]<br/>	
+	&nbsp;&nbsp;&nbsp;
+	}<br/>	
+	}
+</p>
+<p>
+	A <strong>SwingMenuBuilder</strong> variable extension must be created inside the _JMenuBar node. 
+	This can be avoided if <strong>SwingBuilder</strong> <em>extends</em> <strong>SwingMenuBuilder</strong>
+	rather than to reference it with <b><i>@XtendTree(useInsertsFrom=...)</i></b>.<br/>
+	Please hover the mouse above _JMenuBar call and check the javadoc you've created. 
+</p>
+<br/>
+
+<hr>
+
+<br/>
+
+<h3 id="Part3">3 - Keep constructor signatures</h3>
+<br/>
+The main reason to use a builder is to normalize and define good practices.<br/>
+However, It could be useful that method's node signatures mimic the constructor signatures of the objects they have to instantiate.
+That's the purpose of  <b><i>@XtendNode(usingConstructors=<em>true</em>)</i></b>.<br/><br/>
+
+Inside <strong>SwingMenuBuilder</strong> replace:<br/><br/>
+<p class=code>
+	 <i>@XtendNode</i> (inserts =<strong>"add :_JMenuItem"</strong>) 
+	 <em>protected def </em>  _JMenu(){<em>new</em> JMenu}
+</p>
+<br/><br/>
+with:
+<br/><br/>
+<p class=code>
+	 <i>@XtendNode</i> (usingConstructors=<em>true</em>,inserts =<strong>"add :_JMenuItem"</strong>) 
+	 <em>protected def </em> JMenu _JMenu(Object... varArgs){}
+</p>
+<br/><br/>
+<p>
+	Please verify, with the outline view (ctrl+o), there is now four 
+	public methods called _JMenu, each corresponding at a constructor's signature.<br/>
+	The problems with this flag are: <ul>
+		<li>this flag dramatically increase the number of methods.</li>
+		<li>Impossibility to add a process by default on the created object (ie.: default or inferred property values).</li>
+	</ul>
+</p>
+<br/>
+
+<hr>
+
+<br/>
+<h3 id="Part4">4 - Use a Static builder</h3>
+<br/>
+Change all <strong>SwingBuilder</strong> and <strong>SwingMenuBuilder</strong> instance methods to static methods 
+(just add <em>static</em> keyword).<br/><br/>
+
+Inside the test file <strong>SwingFrame</strong>, remove the two extension values (b and mb) then add two static extensions: 
+<br/><br/>
+<p class=code>
+	<em>import</em>...<br/>
+	<em>import static extension</em> org.examples.docxtend.SwingBuilder.*<br/>
+	<em>import static extension</em> org.examples.docxtend.SwingMenuBuilder.*<br/>
+	<br/>
+	<em>class </em>SwingFrame <em>extends</em> JFrame {<br/>
+	...<br/>
+	
+</p>
+<br/>
+"clean the project" should be necessary.
+
+
+<br/><br/>
+</body>
+</html>

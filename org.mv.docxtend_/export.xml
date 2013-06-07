@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="feature_export" name="build">
+	<target name="feature_export">
+		<pde.exportFeatures destination="/home/matthieu/workspace/DocXtend" exportSource="true" exportType="directory" features="org.mv.docxtend_" useJARFormat="true"/>
+	</target>
+</project>

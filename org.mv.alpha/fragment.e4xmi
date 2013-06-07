@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_5zc-ELyhEeK8iNM6AU5e8g">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_FUuo4LyiEeK8iNM6AU5e8g">
+    <elements xsi:type="advanced:Area" xmi:id="_G8OyMLyiEeK8iNM6AU5e8g" elementId="org.mv.alpha.area.0"/>
+    <elements xsi:type="advanced:Area" xmi:id="_IYswMLyiEeK8iNM6AU5e8g" elementId="org.mv.alpha.area.1"/>
+    <elements xsi:type="menu:PopupMenu" xmi:id="_LqR1sLyiEeK8iNM6AU5e8g" elementId="org.mv.alpha.popupmenu.0"/>
+    <elements xsi:type="menu:RenderedToolBar" xmi:id="_N0wwQLyiEeK8iNM6AU5e8g" elementId="org.mv.alpha.renderedtoolbar.0"/>
+  </fragments>
+</fragment:ModelFragments>

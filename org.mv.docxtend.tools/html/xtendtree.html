@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- *******************************************************************************
+* Copyright (c) 2013 M. Vidal (http://www.matthieu-vidal.com) and others.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+******************************************************************************* -->
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Introduction</title>
+	<link  href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" rel="stylesheet" type="text/css">
+	<style type="text/css">	em  {color:darkred;} strong {color:blue;} i {color:darkgrey} </style>
+</head>
+
+<body>
+<h2>Introduction</h2>
+<p>DocXtend is a tool the purpose of which is to help to construct object builders using an 
+<a href="PLUGINS_ROOT/org.eclipse.xtend.doc/contents/Xtend.html">xtend active annotations</a> named @XtendTree.
+Each Node of this tree is represented by a method annotated with @XtendNode. Example:
+</p>
+<p class="code">  
+<i>@XtendTree</i><br/>
+<em>Class</em> e4Builder {<br/>
+	...<br/>
+	<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i>( inserts = <strong>"getChildren().add  : _MToolBarSeparator _MToolControl _MDirectToolItem  _MHandledToolItem"</strong>)<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<em>protected def</em> _MToolBar() {menuFactory.createToolBar}<br/>
+	<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> <em>protected def</em> _MToolBarSeparator() 	{menuFactory.createToolBarSeparator}<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> <em>protected def</em> _MToolControl() 		{menuFactory.createToolControl}<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> <em>protected def</em> _MDirectToolItem() 	{menuFactory.createDirectToolItem}<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> <em>protected def</em> _MHandledToolItem() 	{menuFactory.createHandledToolItem}<br/>
+	...<br/>
+}
+</p>
+<p class="CaptionFigColumn">
+A nodes with an <i>element "inserts"</i> notify that its return type is a container of other nodes.
+The way these nodes will be inserted is indicated before the colon (i.e: getChildrend().add). 
+The nodes that can be inserted are listed, using their method's name, after the colon.
+</p>
+<br/><br/>
+<p>
+The goal, thanks to Xtend extensions and closure builder, is to be able to have the following syntax :
+<p class="code">  
+<em>Class</em> buildE4 {<br/>
+	...<br/>
+	<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<em>extension val</em> b = new e4Builder<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;... => [<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_MToolBar[<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_MDirectToolItem  [ label = "File" ....]<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_MHandledToolItem [ label = "Edit" ....]<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_MToolBarSeparator[]<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			_MDirectToolItem  [ label = "Navigate" ....]<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+	...<br/>
+	}<br/>
+
+</p>
+
+
+<br/>
+<hr/>
+<p>
+<h3>Type annotation @XtendTree</h3>
+	<br/>
+  The  class annotated with this active annotation will define the Xtend Tree of an object builder.
+  <br/><br/>  
+  The <i>Element "useInsertsFrom"</i> can contains the list of other XtendTree's annotated Classes. 
+  The "XtendNodes" from these classes (these builders) could be used as inserts for the containers of the annotated class.
+  <br/>
+  This behavior is similar to a super class extension, except that each class defined that way will be
+  independent from the others (even if they define the same global tree).
+</p> 
+
+<br/>
+<p>
+<h3>Method annotation @XtendNode</h3>
+	<br/>
+  The method annotated with @XtendNode is a node of the Xtend Tree. 
+  <br/><br/>
+  A node can describe a container if <i>"inserts"</i> element describes a way to insert other nodes (identified by their method's name).
+  The way these nodes will be inserted is indicated before the colon. 
+  The nodes that can be inserted are listed, using their method's name, after the colon.
+  <br/><br/>A node is an insert for one or more containers or only here to define a generic type container. 
+  <br/><b>The return type of the method's node (inferred or not) is the container.</b> 
+  <br/><br/>
+  The method annotated with @XtendNode will be "duplicated" as often as this node has containers:
+  <ul>
+  	<li> Each duplicated method will have is corresponding container as first parameter (the Xtend receiver for extension)</li>
+  	<li> Each duplicated method will be enhanced by a last parameter for closure and builder syntax ((NodeType)=> void init) </li>
+  </ul>
+  The <i>Element "usingConstructors"</i> can be set to true if the return type is a real class type having more than one constructor
+  (i.e: SWT objects). With this flag set to true:
+  <ul> 
+  		<li>All the constructors matching the container as Xtend receiver will correspond to a "duplicated" method ; provided they do not
+  		specify an affectation method in the "inserts" statement of this container (nothing before the colon).</li>
+  		<li>Furthermore, if the method's unique parameter is a varArg <Object...>, 
+  		then all the constructors will be duplicated for all containers of this node having an affectation method for this insert.</li>
+  </ul>>
+  <b>Important:</b> If "usingConstructors" flag is not set then the method body is in charge for the creation of the object 
+  (using a factory ... or one of its constructors). This is the better choice as it gives a simple access to object creation and
+  specific adaptation.
+ </li> 
+  
+  <br/><br/>
+  The method visibility should be "protected" as this method should not be visible outside this class. The "duplicated"
+  methods generated from this methods are always public. 
+  The <i>Element "Container"</i> can define the container type (instead )
+</p>
+<p>
+<a href="tutodocxtend.html">Next : Tutorial</a>
+</p>
+</body>
+</html>

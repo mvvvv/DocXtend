@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.mv.docxtend__0.1.0.qualifier.jar" id="org.mv.docxtend_" version="0.1.0.qualifier">
+      <category name="DocXtend"/>
+   </feature>
+   <feature url="features/org.mv.docxtend_.source_0.1.0.qualifier.jar" id="org.mv.docxtend_.source" version="0.1.0.qualifier">
+      <category name="DocXtend"/>
+   </feature>
+   <category-def name="DocXtend" label="DocXtend annotations and tools">
+      <description>
+         DocXtend annotations and tools for expanding tree of an object builder
+      </description>
+   </category-def>
+</site>

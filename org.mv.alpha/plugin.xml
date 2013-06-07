@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            name="org.mv.alpha"
+            application="org.eclipse.e4.ui.workbench.swt.E4Application">
+         <property
+               name="clearPersistedState"
+               value="true">
+         </property>
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/org.mv.alpha/css/default.css">
+         </property>
+         <property
+               name="appName"
+               value="org.mv.alpha">
+         </property>
+         <property
+           name="lifeCycleURI"
+           value="bundleclass://org.mv.alpha/org.mv.alpha.E4Application">
+         </property>
+      </product>
+   </extension>
+</plugin>

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- *******************************************************************************
+* Copyright (c) 2013 M. Vidal (http://www.matthieu-vidal.com) and others.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+******************************************************************************* -->
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>The swing example</title>
+	<link  href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" rel="stylesheet" type="text/css">
+	<style type="text/css">	em  {color:darkred;} strong {color:blue;} i {color:darkgrey} </style>
+</head>
+
+<body>
+<h1>The E4/SWT example</h1>
+<h2>Introduction</h2>
+<br/>
+	The project <strong>org.mv.alpha</strong> contains a RCP Product example that is at first, 
+	an Xtend reproduction of the custom samples provided
+	from the <b>New Eclipse 4 Application Project</b> wizard then some dummy parts have been added for demonstration</br>
+	
+<h2>Installation</h2>
+<br/>	
+	This project has been created with 3 builders:
+	<ul>
+		<li>E4 builder from plugin <strong>"org.mv.docxtend.eclipse.e4"</strong></li>
+		<li>SWT builder from plugin <strong>"org.mv.docxtend.eclipse.swt"</strong></li>
+		<li>JFace builder from plugin <strong>"org.mv.docxtend.eclipse.jface"</strong></li>
+	</ul>
+	these plugins are installed with <strong>DocXtend tools and annotations library</strong>.
+	
+	<br/><br/>
+	To run this example you have to install (thanks to vogella.com and Lars Vogel):
+	<ul>
+	<li><a href="http://www.vogella.com/articles/EclipseRCP/article.html#tutorial_installationrelease">
+		Eclipse Kepler 4.3</a></li>
+	<li><a href="http://www.vogella.com/articles/EclipseRCP/article.html#tutorial_installation2">
+		Eclipse 4 tooling for Kepler</a> </li>
+	</ul>
+	Download Xtext/Xtend (v2.4.2 minimal) from your main central site (Modeling category). 
+	Check also <a href="http://www.eclipse.org/xtend/download.html">Xtend site</a></li>
+	
+	
+	<br/><br/>
+<h2>Description</h2>
+<br/>	
+	In the plugin.xml file, The extension "org.eclipse.core.runtime.products" has be enhanced with 
+	a new lifeCycleURI property indicating where to find the E4Application definition: 
+	<strong>org.mv.alpha.E4Application.xtend</strong>
+	<br/><br/>
+	<p class="code">
+		<textarea disabled="disabled" rows="25" cols="70" style="color:blue;">
+    		<extension
+		         id="product"
+		         point="org.eclipse.core.runtime.products">
+		      <product
+		            name="org.mv.alpha"
+		            application="org.eclipse.e4.ui.workbench.swt.E4Application">
+		         <property
+		               name="clearPersistedState"
+		               value="true">
+		         </property>
+		         <property
+		               name="applicationCSS"
+		               value="platform:/plugin/org.mv.alpha/css/default.css">
+		         </property>
+		         <property
+		               name="appName"
+		               value="org.mv.alpha">
+		         </property>
+		         <property
+		           name="lifeCycleURI"
+		           value="bundleclass://org.mv.alpha/org.mv.alpha.E4Application">
+		         </property>
+		      </product>
+		   </extension>
+	   </textarea>
+	</p>
+	<br/><br/>
+	The file E4Application.e4xmi is made of an empty <strong>&lt;application:Application .../&gt;</strong> element
+	<br/><br/>
+	All the Menu Handlers share the same compilation unit <strong>org.mv.alpha.handlers.AllMenuHandlers.xtend</strong>
+	<br/><br/>
+	All the contribution parts share the same compilation unit <strong>org.mv.alpha.parts.AllParts.xtend</strong>
+
+	<br/><br/>
+<h2>Launch the example</h2>
+<br/>	
+	Open the file <Strong>org.mv.alpha.product</Strong> then click on "overview tab &raquo;launch an eclipse application"
+	
+	<br/><br/>
+</body>
+</html>

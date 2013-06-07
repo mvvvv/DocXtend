@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+    	point="org.eclipse.jdt.core.classpathContainerInitializer">
+   		<classpathContainerInitializer
+       		id="org.mv.docxtend.DocXtend_Container"
+       		class="org.mv.docxtend.tools.wizards.DocXtendContainerInitializer"/>
+	</extension>
+	<extension point="org.eclipse.jdt.ui.classpathContainerPage">
+  		<classpathContainerPage
+        	name="%DocXtendLibrary_name"
+        	class="org.mv.docxtend.tools.wizards.DocXtendContainerPage"
+        	id="org.mv.docxtend.DocXtend_Container">
+  		</classpathContainerPage>
+	</extension>
+	
+	 <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml">
+      </toc>
+      <toc
+            file="docXtendToc.xml"
+            primary="true">
+      </toc>
+   </extension>
+   
+   	<!--- <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            name="DocXtend Wizards"
+            id="org.mv.docxtend.tools">
+      </category>
+      <wizard
+            name="new @XtendTree Class from DocXtend "
+            icon="icons/sample.gif"
+            category="org.mv.docxtend.tools"
+            class="org.mv.docxtend.tools.wizards.NewXtendTreeBuilder"
+            id="org.mv.docxtend.tools.wizards.NewXtendTreeBuilder">
+      </wizard>
+   	</extension>-->
+
+</plugin>
