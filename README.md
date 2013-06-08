@@ -1,4 +1,4 @@
-<p>Xtend annotations to create object builders</p>
+<h2>Xtend active annotations which helps to create object builders</h2>
 
 <p>org.mv.docxtend_ is the feature. Do an "export deployabe Feature" to create the p2 update site.</p>
 
