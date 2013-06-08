@@ -9,8 +9,9 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<title>Tutorial</title>
-	<link  href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" rel="stylesheet" type="text/css">
+	<title>DocXtend - Tutorial</title>
+	<link  href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" title="the css" rel="stylesheet" type="text/css">
+	<link  href="dummy.css" title="the css" rel="stylesheet" type="text/css">
 	<style type="text/css">	em  {color:darkred;} strong {color:blue;} i {color:darkgrey} </style>
 	
 </head>
@@ -32,7 +33,7 @@ Regarding whether or not the project is a plugin:
 	</ul>
 	
 <br/><br/>
-Create a <b>new Xtend Class</b> called <strong>SwingMenuBuilder</strong>:
+Create a <b>new Xtend Class</b> named <strong>SwingMenuBuilder</strong>:
 <br/><br/>
 <p class="code">  
 	<i>@XtendTree</i><br/>
@@ -55,7 +56,7 @@ Create a <b>new Xtend Class</b> called <strong>SwingMenuBuilder</strong>:
 </p>
 
 <br/><br/>
-Create a <b>new Xtend Class</b> called <strong>SwingBuilder</strong> (In the same compilation unit than SwingMenuBuilder if you want):
+Create a <b>new Xtend Class</b> named <strong>SwingBuilder</strong> (In the same compilation unit than SwingMenuBuilder if you want):
 
 <br/><br/>
 <p class="code">  
@@ -96,7 +97,7 @@ Create a <b>new Xtend Class</b> called <strong>SwingBuilder</strong> (In the sam
 <br/>
 <h3 id="Part2">2 - Use a Builder</h3>
 <br/>
-Create a <b>new xtend class</b> called <strong>SwingFrame</strong> extending JFrame:
+Create a <b>new xtend class</b> named <strong>SwingFrame</strong> extending JFrame:
 <br/><br/>
 <p class="code">  
 	<em>class </em>SwingFrame <em>extends</em> JFrame {<br/>
@@ -191,7 +192,7 @@ with:
 <br/><br/>
 <p>
 	Please verify, with the outline view (ctrl+o), there is now four 
-	public methods called _JMenu, each corresponding at a constructor's signature.<br/>
+	public methods named _JMenu, each corresponding at a constructor's signature.<br/>
 	The problems with this flag are: <ul>
 		<li>this flag dramatically increase the number of methods.</li>
 		<li>Impossibility to add a process by default on the created object (ie.: default or inferred property values).</li>

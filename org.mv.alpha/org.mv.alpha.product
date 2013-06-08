@@ -3,7 +3,6 @@
 
 <product name="org.mv.alpha" uid="org.mv.alpha.product" id="org.mv.alpha.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
 
-
    <configIni use="default">
    </configIni>
 
@@ -14,14 +13,12 @@
 
    <windowImages/>
 
-
    <launcher name="alpha">
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
@@ -167,7 +164,6 @@
       <plugin id="org.mv.docxtend.eclipse.e4"/>
       <plugin id="org.mv.docxtend.eclipse.jface"/>
       <plugin id="org.mv.docxtend.eclipse.swt"/>
-      <plugin id="org.mv.docxtend.tools"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.smil"/>
       <plugin id="org.w3c.dom.svg"/>
