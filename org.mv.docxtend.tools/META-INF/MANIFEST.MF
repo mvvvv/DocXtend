@@ -1,14 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Tools
+Bundle-Name: %pluginName
 Bundle-SymbolicName: org.mv.docxtend.tools;singleton:=true
-Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: MV
-Bundle-Localization: plugin
+Bundle-Version: 0.1.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core;bundle-version="3.9.0",
  org.eclipse.jdt.ui;bundle-version="3.9.0",
  org.eclipse.xtend.lib;bundle-version="2.4.2",
  org.mv.docxtend.eclipse.swt;bundle-version="0.1.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
