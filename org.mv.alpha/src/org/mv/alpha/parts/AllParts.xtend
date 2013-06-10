@@ -20,7 +20,7 @@ import org.mv.docxtend.eclipse.jface.JfaceBuilder
 import org.mv.docxtend.eclipse.swt.SwtApplicationBuilder
 import org.mv.docxtend.eclipse.swt.SwtBuilder
 
-/**The samplePart class as define by the new e4 application project creation */
+/**The samplePart class as define by the new e4 application project creation  */
 class SamplePart {
 
 	private var TableViewer tableViewer;
@@ -43,6 +43,7 @@ class SamplePart {
 				add("Sample item 5")
 				table =>[ _GridData(GridData.FILL_BOTH)[] ]
 			]
+			_Label(SWT.NONE)[text = "Sample table"]
 		]
 	}
 

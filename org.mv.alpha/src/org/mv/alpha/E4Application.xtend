@@ -13,9 +13,11 @@ class E4Application {
 	def createApp(MApplication application, EModelService service) {
 
 		val extension e4 = new E4ApplicationBuilder
+		
 		// ------------------------------------------------------
-		// First we need addons  
+		// First we need addons    
 		application => [
+					
 			_MAddon[elementId = "org.eclipse.e4.core.commands.service"
 				contributionURI = "bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"]
 			_MAddon[elementId = "org.eclipse.e4.ui.contexts.service"
@@ -45,7 +47,7 @@ class E4Application {
 				command = saveCommand
 			]
 			val quitCommand = _MCommand [
-				elementId = "org.eclipse.ui.file.exit"
+				elementId = IE4BestPactrice::Exit_Id //"org.eclipse.ui.file.exit"
 				commandName = "quitCommand"
 			]
 			_MHandler [

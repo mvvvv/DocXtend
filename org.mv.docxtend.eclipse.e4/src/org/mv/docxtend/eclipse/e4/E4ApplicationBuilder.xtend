@@ -26,7 +26,7 @@ import org.mv.docxtend.XtendTree
  *
  */
 @XtendTree(useInsertsFrom=typeof(E4Builder))
-class E4ApplicationBuilder { 
+final class E4ApplicationBuilder { 
 
 	private val applicationFactory = MApplicationFactory::INSTANCE
  	
