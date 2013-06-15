@@ -64,7 +64,7 @@ public class SaveHandler {
 		dialog.open();
 		dialog.run(true, true, 
 			[IProgressMonitor monitor|
-				pmContext.set(IProgressMonitor.class.getName(), monitor);
+				pmContext.set(typeof(IProgressMonitor).getName(), monitor);
 				if (contribution != null) {
 					//Object clientObject = contribution.getObject();
 					//					ContextInjectionFactory.invoke(clientObject, Persist.class, //$NON-NLS-1$

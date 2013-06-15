@@ -1,9 +1,11 @@
 package org.mv.docxtend.eclipse.e4
 
+import org.osgi.framework.FrameworkUtil
+
 /**
  * Best Pactrice values
  */
-public static class IE4BestPactrice {
+public static class E4BestPractice {
 
 	public static val Save = "SaveCommand"
 	public static val Save_Label = "Save"
@@ -72,5 +74,19 @@ public static class IE4BestPactrice {
 	public static val Exit_Label = "Exit"
 	public static val Exit_Id = "org.eclipse.ui.file.exit"
 	public static val Exit_keyBinding = "M1+Q"
+
+
+	/**Get the bundleString of a class
+	 * @Param clazz the class contributing
+	 */
+	static def getBundleString(Class<?> clazz) {
+		var bundleClass = "bundleclass://"
+		if (clazz != null) {
+			val bundle = FrameworkUtil.getBundle(clazz)
+			if(bundle != null && bundle.getSymbolicName() != null) 
+				return bundleClass + bundle.getSymbolicName() + "/" + clazz.name
+		}
+		return null
+	}
 
 }

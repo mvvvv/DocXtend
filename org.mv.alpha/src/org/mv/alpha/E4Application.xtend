@@ -3,9 +3,12 @@ package org.mv.alpha
 import org.eclipse.e4.ui.model.application.MApplication
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions
 import org.eclipse.e4.ui.workbench.modeling.EModelService
+import org.mv.alpha.handlers.QuitHandler
+import org.mv.alpha.handlers.SaveHandler
 import org.mv.docxtend.eclipse.e4.E4ApplicationBuilder
 import org.mv.docxtend.eclipse.e4.E4Builder
-import org.mv.docxtend.eclipse.e4.IE4BestPactrice
+
+import static org.mv.docxtend.eclipse.e4.E4BestPractice.*
 
 class E4Application {
 
@@ -38,23 +41,25 @@ class E4Application {
 			//------------------------------------------------------
 			// ---We need commands and handlers	
 			val saveCommand = _MCommand [
-				elementId = IE4BestPactrice::Save_Id //"org.eclipse.ui.file.save"
-				commandName = "saveCommand"
+				elementId = Save_Id //"org.eclipse.ui.file.save"
+				commandName = Save	//"saveCommand"
 			]
-			_MHandler [
+			_MHandler [ 				
 				elementId = "org.mv.alpha.handler.saveCommand"
-				contributionURI = "bundleclass://org.mv.alpha/org.mv.alpha.handlers.SaveHandler"
+				contributionURI = getBundleString(SaveHandler) //"bundleclass://org.mv.alpha/org.mv.alpha.handlers.SaveHandler"
 				command = saveCommand
 			]
+			//----
 			val quitCommand = _MCommand [
-				elementId = IE4BestPactrice::Exit_Id //"org.eclipse.ui.file.exit"
-				commandName = "quitCommand"
+				elementId = Exit_Id //"org.eclipse.ui.file.exit"
+				commandName = Exit	//"ExitCommand"
 			]
 			_MHandler [
 				elementId = "org.mv.alpha.handler.quitCommand"
-				contributionURI = "bundleclass://org.mv.alpha/org.mv.alpha.handlers.QuitHandler"
+				contributionURI = getBundleString(QuitHandler) //"bundleclass://org.mv.alpha/org.mv.alpha.handlers.QuitHandler"
 				command = quitCommand
 			]
+			//----
 			val openCommand = _MCommand [
 				elementId = "org.mv.alpha.open"
 				commandName = "openCommand"
@@ -64,6 +69,7 @@ class E4Application {
 				contributionURI = "bundleclass://org.mv.alpha/org.mv.alpha.handlers.OpenHandler"
 				command = openCommand
 			]
+			//----
 			val aboutCommand = _MCommand [
 				elementId = "org.eclipse.ui.help.aboutAction"
 				commandName = "aboutCommand"
@@ -78,7 +84,6 @@ class E4Application {
 			// --- We add a window
 			val extension e4Element = new E4Builder
 			_MTrimmedWindow[
-				//_MTrimmedWindow[ width = 200 height = 200]  
 				label = "Example Xe4"
 				width = 600
 				height = 800
