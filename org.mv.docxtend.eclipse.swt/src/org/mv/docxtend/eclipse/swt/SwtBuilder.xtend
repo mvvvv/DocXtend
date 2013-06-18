@@ -69,16 +69,16 @@ import org.eclipse.swt.widgets.TreeItem
 import org.mv.docxtend.XtendNode
 import org.mv.docxtend.XtendTree
 
-/** 
+/**
  * This class will be xtend(ed)  to a class setting the hierarchical tree of  "Standard Widget Toolkit" <br/><br/>
  * 
  * All the xtend(tion) are based upon the "Model Object" (Button Label Combo ...) <br/>
- *  
+ *   
  *
  * @author mvidal           
  * @version 0.1         
- * @see org.mv.docxtend.eclipse.jface.JfaceBuilder.JfaceBuilder   
- * @See SwtApplicationBuilder    
+ * @see org.mv.docxtend.eclipse.jface.JfaceBuilder    
+ * @see SwtApplicationBuilder       
  */
 @XtendTree  
 class SwtBuilder { 

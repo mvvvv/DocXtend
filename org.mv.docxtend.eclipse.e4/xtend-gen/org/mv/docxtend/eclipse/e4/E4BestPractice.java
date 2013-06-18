@@ -116,7 +116,8 @@ public class E4BestPractice {
   
   /**
    * Get the bundleString of a class
-   * @Param clazz the class contributing
+   * @param clazz the class contributing
+   * @return string of the bundle : bundleclass://bundle Id .../class name ...
    */
   public static String getBundleString(final Class<? extends Object> clazz) {
     String bundleClass = "bundleclass://";

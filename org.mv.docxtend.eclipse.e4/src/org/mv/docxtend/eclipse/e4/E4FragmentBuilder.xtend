@@ -6,6 +6,10 @@ import org.mv.docxtend.XtendTree
 
 /** 
  * This final class will be xtend(ed)  to a final class setting the hierarchical tree of a "e4 rcp fragment"
+ * 
+ * @see E4Builder
+ * @see E4ApplicationBuilder
+ * 
  * @author mvidal 
  * @version 0.1  
  */

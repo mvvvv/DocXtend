@@ -11,15 +11,13 @@ import org.mv.docxtend.XtendTree
  * This class will be xtend(ed)  to a class setting the hierarchical tree of a "e4 rcp application"
  * 
  * All the xtend(tion) are based upon the "Model Object Interfaces" (MApplication MWindow MPart ...)<br/><br/>
- * it's also possible to use generic types to avoid repetitions :<br/>
- * 			-->MElementContainer<MWindow>... insertWith="getChildren().add", insert="_MTrimmedWindow _MWindow"<br/>
- *    instead of <br/>
- *  		-->MApplication... insertWith="getChildren().add", insert="_MTrimmedWindow _MWindow"<br/><br/>
+ * generic types (ie : MElementContainer<MWindow>) are not used here, so you will see repetitions.
+ * <br/><br/>
  * 
- * but with generic types you have to declare a "dummy method" with an explicit return type 	<br/><br/>
+ * The advantage of repeat inserts expression for each real object is precision and therefore helping to construct good practices. 
  * 
- * An other advantage of repeating for each real object is precision and therefore helping to construct good practices. 
- * 
+ * @see E4FragmentBuilder
+ * @see E4Builder
  * 
  * @author mvidal        
  * @version 0.1    

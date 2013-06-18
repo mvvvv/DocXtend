@@ -212,7 +212,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 		}
 
 		
-		//------We do not tolerate parameterized constructors
+		//------We do not tolerate parameterized constructors 
 		for (constructor : annotatedClass.declaredConstructors) {
 			if (! constructor.parameters.isEmpty) {
 				constructor.addError("Constructors with parameters are not allowed with @XtendTree.")
@@ -226,20 +226,20 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 			thisAnnotation.addError("Unable to Xtend the tree (no Types) : check @XtendNode tags of this class")
 
 		//-----------------Make a Nice Javadoc (Not possible too ugly) and xtend editor sees nothing
-		//		
-		//		if (true || annotatedClass.docComment.contains(treeDetail)) {
-		//			var docAddendum = "<br/><h2>Detail :</h2>\n<BR/>"
-		//			for (typeName : xContainer.keySet) {
-		//				docAddendum = docAddendum + "<h2>" + typeName + "</h2><ul>"
-		//				for (insert : xContainer.get(typeName)) {
-		//					docAddendum = docAddendum + "<li>" + insert.replace("..", "  ---> ") + "</li>"
-		//				}
-		//				docAddendum = docAddendum + "</ul>"
-		//
-		//			}
-		//			//annotatedClass.docComment.replace(treeDetail, docAddendum)
-		//			annotatedClass.docComment = annotatedClass.docComment + docAddendum
-		//		}
+		if (true ) {
+			var docAddendum = '<p><i>This class contains the following XtendNode methods :</i><br/><br/>'
+			for (typeName : xContainer.keySet.sort) {
+				docAddendum = docAddendum + "<b>" + typeName + " can be inserted in :</b><ul>"
+				for (insert : xContainer.get(typeName)) {
+					docAddendum = docAddendum + "<li>" + insert.replace("..", "  ---> ") + "</li>"
+				}
+				docAddendum = docAddendum + "</ul><br/>"
+			}
+			docAddendum = docAddendum + "</p>"
+			
+			//annotatedClass.docComment.replace(treeDetail, docAddendum)
+			annotatedClass.docComment = docAddendum + annotatedClass.docComment?:""  
+		}
 
 	}
 	
@@ -304,8 +304,8 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 	/**
 	 * We work on all the existing method Nodes (from extended class and "useInsertFrom classes")
 	 * @return all the accessible methods of the given class 
-	 * @see #error(MethodDeclaration, MutableClassDeclaration,TransformationContext) 
-	 * @see #warning(MethodDeclaration, MutableClassDeclaration,TransformationContext) 
+	 * @see #error(MethodDeclaration, MutableClassDeclaration,TransformationContext,String) 
+	 * @see #warning(MethodDeclaration, MutableClassDeclaration,TransformationContext,String) 
 	 */
 	protected def addAccessibleMethods(MutableClassDeclaration annotatedClass) {
 
@@ -558,12 +558,13 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 							''']
 						docComment = "Insert a new " + method.returnType + "[...] instance inside a " +
 							exprAffectation.replaceFirst("\\.\\.", " object with '") + "'."
-						docComment = docComment + "<br>See {@link " + annotatedClass.compilationUnit.simpleName + "}"
+						docComment = docComment + "<br>See {@link " + annotatedClass.compilationUnit.packageName + "."+
+						annotatedClass.compilationUnit.simpleName + "}"
 						docComment = docComment + "\n@param parent is the container/receiver"
 						docComment = docComment + "\n@param init is the closure builder where inserts can be added "
 						docComment = docComment + "\n@return the new created " + method.returnType +
 							"[...] Object"
-						docComment = docComment + " with {@link #"  + method.simpleName + "(" + paramTypesString + ")}"
+						docComment = docComment + " with {@link "+ method.declaringType.qualifiedName +"#"  + method.simpleName + "(" + paramTypesString + ")}"
 						docComment = docComment + "\n@see " + method.returnType.name
 						setExceptions(method.exceptions)
 					//---Todo check the generated code and follow up errors to xtend file Bug 408083
@@ -709,11 +710,11 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 		/** From a constructor of the object type returned by the node method, 
 		 * duplicate this method for all containers of this node
-		 * @Param constructor : the constructor that will be used for the duplication
-		 * @Param method : the originate method Node which name will be used for duplication
-		 * @Param containers : All the container names for this node -> affectation method string
-		 * @Param annotateClass : The subject of this work 
-		 * @Param context : The magic transformation context ... as extension
+		 * @param constructor : the constructor that will be used for the duplication
+		 * @param method : the originate method Node which name will be used for duplication
+		 * @param containers : All the container names for this node -> affectation method string
+		 * @param annotatedClass : The subject of this work 
+		 * @param context : The magic transformation context ... as extension
 		 */
 		def protected duplicateNodeMethods(ConstructorDeclaration constructor, 
 			MethodDeclaration method, 
@@ -771,11 +772,12 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 						''']
 					docComment = "Create a new " + method.returnType + "[...] instance associated to a " +
 						container.simpleName + operTextOrNothing + "."
-					docComment = docComment + " See {@link " + annotatedClass.compilationUnit.simpleName +"}"
+					docComment = docComment + " See {@link " + annotatedClass.compilationUnit.packageName +
+												"." + annotatedClass.compilationUnit.simpleName + "}"
 					if (operAff != "") docComment = docComment + "\n@param parent is the receiver"
 					docComment = docComment + "\n@param init is the closure builder where inserts can be added "
-					docComment = docComment + "\n@return the new created {@link "+ method.returnType.name + "#Constructor(" +
-						paramTypesString + ") " + method.returnType + "[...]} Object"
+					docComment = docComment + "\n@return the new created {@link "+ method.returnType.name + "#" + 
+								method.returnType.simpleName +"(" + paramTypesString + ") " + method.returnType + "[...]} Object"
 					docComment = docComment + "\n@see " + container.name
 					//docComment = docComment + "\n@see " + method.returnType.name + "#Constructor(" +
 						//paramTypesString + ")"
@@ -862,7 +864,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 		}
 
-		/**@Return true if this method has @XtendNode(usingConstructors = true) */
+		/**@return true if this method has @XtendNode(usingConstructors = true) */
 		protected def getIsToGenerateFromConstructors(MethodDeclaration method) {
 			var defaultValue = false
 			for (annotation : method.annotations.filter[

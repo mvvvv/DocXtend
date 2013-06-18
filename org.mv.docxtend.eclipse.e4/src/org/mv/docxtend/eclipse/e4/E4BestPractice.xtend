@@ -77,7 +77,8 @@ public static class E4BestPractice {
 
 
 	/**Get the bundleString of a class
-	 * @Param clazz the class contributing
+	 * @param clazz the class contributing
+	 * @return string of the bundle : bundleclass://bundle Id .../class name ...
 	 */
 	static def getBundleString(Class<?> clazz) {
 		var bundleClass = "bundleclass://"

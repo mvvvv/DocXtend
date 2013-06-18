@@ -43,8 +43,8 @@ import org.mv.docxtend.XtendTree
  * @author mvidal           
  * @version 0.1        
  *
- * @See SwtApplicationBuilder 
- * @See SwtBuilder          
+ * @see org.mv.docxtend.eclipse.swt.SwtApplicationBuilder 
+ * @see org.mv.docxtend.eclipse.swt.SwtBuilder          
  */
 @XtendTree
 class JfaceBuilder {

@@ -14,6 +14,9 @@ import org.mv.docxtend.XtendTree
 /** 
  * This class will be xtend(ed)  to a class setting e4 object to be use either by an e4 application or e4 fragment
  * 
+ * @see E4ApplicationBuilder
+ * @see E4FragmentBuilder
+ * 
  * @author mvidal     
  * @version 0.1  
  *    
@@ -62,7 +65,7 @@ class E4Builder {
 
 
 
-
+	/** */
 	@XtendNode( inserts = 
 			"getChildren().add  : _MPart _MInputPart  _MPartStack _MPartSashContainer _MArea _MPlaceHolder")
 	protected def _MPartSashContainer() {basicFactory.createPartSashContainer}
