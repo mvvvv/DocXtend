@@ -47,7 +47,7 @@ import org.eclipse.xtend.lib.macro.declaration.AnnotationReference
 @Target(value=ElementType::TYPE)
 @Documented
 @Retention(RetentionPolicy::SOURCE)
-@Active(typeof(XtendTreeProcessor))
+@Active(XtendTreeProcessor)
 annotation XtendTree {
 		Class<?>[]  useInsertsFrom = #[]
 }
@@ -143,7 +143,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 		//--------------------------------------------------------
 		//------------------Read the class and method annotations
-		val thisAnnotation = annotatedClass.findAnnotation(typeof(XtendTree).findTypeGlobally)
+		val thisAnnotation = annotatedClass.findAnnotation(XtendTree.findTypeGlobally)
 		
 		//---Add all the inserts we have in userInsertFrom
 		annotatedClass.addAccessibleClasses(thisAnnotation, context)
@@ -255,7 +255,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 		val object = xtendTreeAno.getValue(IXtendTree::useInsertsFrom)
 		if (object != null) {
 			
-			if (typeof(List).isInstance(object)) {
+			if (List.isInstance(object)) {
 				for (objectDef : object as List<?>) {
 					val ref = objectDef.getReferencedClass(annotatedClass, context)
 					if (ref != null)
@@ -281,17 +281,17 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 	 */
 	protected def getReferencedClass(Object object, MutableClassDeclaration annotatedClass, extension TransformationContext context ) {
 		var TypeReference objectRef
-		if (typeof(ClassDeclaration).isInstance(object)){
+		if (ClassDeclaration.isInstance(object)){
 			objectRef = object as TypeReference					
 		}
 		else {//---Ugly  workaround of the JvmGeneric bug
 			val fromObjectString = object.toString.replaceFirst(".* identifier:","").replaceFirst("\\).*", "")
 			objectRef = newTypeReference(fromObjectString)
 		}
-		if (objectRef != null && typeof(ClassDeclaration).isInstance(objectRef.type )) {
+		if (objectRef != null && ClassDeclaration.isInstance(objectRef.type )) {
 					val classDec = objectRef.type as ClassDeclaration
 					if (! classDec.isFinal && 
-						classDec.findAnnotation(typeof(XtendTree).findTypeGlobally) != null	&&
+						classDec.findAnnotation(XtendTree.findTypeGlobally) != null	&&
 						( 	classDec.visibility == Visibility::PUBLIC || 
 							(	classDec.visibility== Visibility::PROTECTED && 
 								classDec.qualifiedName.replaceFirst(classDec.simpleName+"$","") ==
@@ -347,7 +347,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 				//---Setting the typeReference from the annotated XtendNode "container" parameter
 				for (annotation : method.xtendNodeS) {
-					if (annotation.getValue(IXtendNode::container) == typeof(Object)) {
+					if (annotation.getValue(IXtendNode::container) == Object) {
 
 						val cType = annotation.getValue(IXtendNode::container) as Class<?>
 						val cTypeRef = newTypeReference(cType)
@@ -397,12 +397,12 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 			
 
 			//---Setting the typeReference from the annotated XtendNodes "container" parameter
-			val annotation = method.findAnnotation(typeof(XtendNode).findTypeGlobally)
+			val annotation = method.findAnnotation(XtendNode.findTypeGlobally)
 			if (annotation != null) {
 				val evals = <String>newArrayList()
 				val insertsValue = annotation.getValue(IXtendNode::inserts)
 				if (insertsValue != null) {
-					if (insertsValue.class == typeof(String)) {
+					if (insertsValue.class == String) {
 						val insertsString = insertsValue as String
 						if (! insertsString.nullOrEmpty)
 							evals.add(insertsString)
@@ -420,7 +420,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 							annotation.addError(
 								"'inserts' attribute must have a colon which separates an "+
 								"optional expression from a list of node's method")
-						if (annotation.getValue(IXtendNode::container) == typeof(Object)) {
+						if (annotation.getValue(IXtendNode::container) == Object) {
 							val cType = annotation.getValue(IXtendNode::container) as Class<?>
 							currentEval = cType.simpleName + ".." + eval2Part.head.trim
 
@@ -532,7 +532,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 						method.parameters.forEach[xMethod.addParameter(simpleName + "_" , type)]
 						visibility = Visibility::PUBLIC
 						returnType = method.returnType
-						addParameter("init", typeof(Procedures$Procedure1).newTypeReference(returnType))
+						addParameter("init", Procedures$Procedure1.newTypeReference(returnType))
 						var paramsString = ""
 						var paramTypesString = ""
 						for (param : method.parameters) {
@@ -597,14 +597,14 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 					isIncluded = true
 				} else if (method.parameters.size == 1) {
 					val param = method.parameters.head
-					if (method.isVarArgs && param.type == typeof(Object).newTypeReference.newArrayTypeReference())
+					if (method.isVarArgs && param.type == Object.newTypeReference.newArrayTypeReference())
 						isIncluded = false
 				}
 				if ( isIncluded == null  )
 					method.error(annotatedClass, context,
 						"With " + IXtendNode::usingConstructors + " only one varArg 'Object...' parameter can be declared (or none)" )
 
-				if (method.returnType == typeof(Object).newTypeReference())
+				if (method.returnType == Object.newTypeReference())
 					method.error (annotatedClass, context, method.simpleName + 
 						"return type cannot be inferred (or Object is forbidden) : specify the method return type"
 					)
@@ -758,7 +758,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 					visibility = Visibility::PUBLIC
 					returnType = method.returnType
-					addParameter("init", typeof(Procedures$Procedure1).newTypeReference(returnType))
+					addParameter("init", Procedures$Procedure1.newTypeReference(returnType))
 					val oper = "new " + method.returnType.simpleName + " (" + paramsString + ")"
 					val operOrNothing = operAff
 					val operTextOrNothing = operAffText
@@ -792,13 +792,13 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 		/**@return the XtendTree (the last one) attached to this class or null if none */
 		protected def getXtendTree(ClassDeclaration member){
-			val annotations = member.annotations.filter[annotationTypeDeclaration.qualifiedName == typeof(XtendTree).name]
+			val annotations = member.annotations.filter[annotationTypeDeclaration.qualifiedName == XtendTree.name]
 			return annotations.last 
 		}
 
 		/**@return the XtendNode(s) attached to this member or null if none */
 		protected def getXtendNodeS(MemberDeclaration member){
-			val annotations = member.annotations.filter[annotationTypeDeclaration.qualifiedName == typeof(XtendNode).name]
+			val annotations = member.annotations.filter[annotationTypeDeclaration.qualifiedName == XtendNode.name]
 			return annotations 
 		}
 		
@@ -868,7 +868,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 		protected def getIsToGenerateFromConstructors(MethodDeclaration method) {
 			var defaultValue = false
 			for (annotation : method.annotations.filter[
-				annotationTypeDeclaration.qualifiedName == typeof(XtendNode).name]) {
+				annotationTypeDeclaration.qualifiedName == XtendNode.name]) {
 				val booli = annotation.getValue(IXtendNode::usingConstructors) as Boolean
 				if (booli != null && booli != defaultValue) {
 					return true
