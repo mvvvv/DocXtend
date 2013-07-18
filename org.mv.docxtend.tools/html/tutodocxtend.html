@@ -196,6 +196,7 @@ with:
 	The problems with this flag are: <ul>
 		<li>This flag dramatically increase the number of methods.</li>
 		<li>Impossibility to add a process by default on the created object (ie.: default or inferred property values).</li>
+		<li>The constructors with a varArg object at the end of their signature, cannot be duplicated.</li>
 	</ul>
 </p>
 <br/>
@@ -221,8 +222,30 @@ Inside the test file <strong>SwingFrame</strong>, remove the two extension value
 </p>
 <br/>
 "clean the project" should be necessary.
+<hr>
 
-
+<br/>
+<h3 id="Part5">5 - How to use a dispatch method</h3>
+<br/>
+In some complex cases, and to avoid having too many duplicated methods, it can be useful to use a dispatch method.
 <br/><br/>
+
+Inside the test file <strong>SwingMenuBuilder</strong>, add two dispatch methods  named &quot;dispatchContainer&quot; and one dummy method named &quot;xDummyContainer&quot;:<br/><br/>
+<p class=code>
+	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def duplicate </em>dispatchContainer (JMenuBar parent, JMenuItem){ parent.add(JMenuItem) }<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def duplicate </em>dispatchContainer (JMenu parent, JMenuItem){ parent.add(JMenuItem) }<br/></br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts =<strong>"@dispatchContainer :_JMenuItem"</strong>) 
+	 <em>protected def </em> Object _xDummyContainer(){}
+</p>
+Then replace the &quot;_JMenu&quot;  and &quot;_JMenuBar&quot; methods :
+<p class="code">  
+
+	 &nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts=<strong>"add:_JMenu"</strong>) 
+	 <em>protected def </em>_JMenuBar(){<em>new</em> JMenuBar}<br/>
+	 &nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i>  
+	 <em>protected def </em>  _JMenu(){<em>new</em> JMenu}<br/>
+	 }
+</p>
+The &quot;@&quot; prefix indicates to use a method of the builder instead of a method of the parent<br/>
 </body>
 </html>

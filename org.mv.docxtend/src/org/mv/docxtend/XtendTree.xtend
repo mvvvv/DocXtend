@@ -62,7 +62,8 @@ interface IXtendTree {
   The method annotated with @XtendNode is a node of the Xtend Tree. 
   <br/><br/>
   A node can describe a container if <i>"inserts"</i> element describes a way to insert other nodes (identified by their method's name).
-  The way these nodes will be inserted is indicated before the colon. 
+  The way these nodes will be inserted is indicated before the colon. The prefix '@' indicates that the method is a method of 
+  the annotated class.
   The nodes that can be inserted are listed, using their method's name, after the colon.
   <br/><br/>A node is an insert for one or more containers or only here to define a generic type container. 
   <br/><b>The return type of the method's node (inferred or not) is the container.</b> 
@@ -83,12 +84,12 @@ interface IXtendTree {
   <b>Important:</b> If "usingConstructors" flag is not set then the method body is in charge for the creation of the object 
   (using a factory ... or one of its constructors). This is the better choice as it gives a simple access to object creation and
   specific adaptation.
- </li> 
+  </li> 
   
   <br/><br/>
   The method visibility should be "protected" as this method should not be visible outside this class. The "duplicated"
   methods generated from this methods are always public. 
-  The <i>Element "Container"</i> can define the container type (instead )
+  The <i>Element "Container"</i> can define the container type (not useful now)
  * @author mvidal           
  * @see XtendTree
  */
@@ -229,9 +230,9 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 		if (true ) {
 			var docAddendum = '<p><i>This class contains the following XtendNode methods :</i><br/><br/>'
 			for (typeName : xContainer.keySet.sort) {
-				docAddendum = docAddendum + "<b>" + typeName + " can be inserted in :</b><ul>"
+				docAddendum = docAddendum + "\n<b>" + typeName.toHtml + " can be inserted in :</b><ul>\n"
 				for (insert : xContainer.get(typeName)) {
-					docAddendum = docAddendum + "<li>" + insert.replace("..", "  ---> ") + "</li>"
+					docAddendum = docAddendum + "<li>" + insert.toHtml.replace("..", "  ---> ") + "</li>\n"
 				}
 				docAddendum = docAddendum + "</ul><br/>"
 			}
@@ -366,7 +367,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 				for (methodIter : methodCheck) {
 					if (classTypeRef == null)
 						classTypeRef = methodIter.returnType
-					else if (classTypeRef != methodIter.returnType) {
+					else if (classTypeRef.name != methodIter.returnType.name) {
 						method.error(annotatedClass, context,
 							methodIter.returnType.simpleName + " type mismatch with other method return type : " +
 								classTypeRef)
@@ -420,6 +421,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 							annotation.addError(
 								"'inserts' attribute must have a colon which separates an "+
 								"optional expression from a list of node's method")
+						
 						if (annotation.getValue(IXtendNode::container) == Object) {
 							val cType = annotation.getValue(IXtendNode::container) as Class<?>
 							currentEval = cType.simpleName + ".." + eval2Part.head.trim
@@ -466,7 +468,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 						var doc = ""
 						for (eval : evals) {
 							val cleanEval = eval.replaceAll("\\s+", " ")
-							doc = doc + "<br/>" + cleanEval + "<br>"
+							doc = doc + "<br/>" + cleanEval + "<br/>"
 							cleanEvals += cleanEval
 						}
 						annotation.remove(IXtendNode::inserts)
@@ -490,20 +492,36 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 		try {
 
 			if (xContainer.containsKey(method.simpleName)) {
-
+				
+				//---First we have to chech if we are on a generic method.
+				val genericPrefix = {
+					if (method.typeParameters.empty) ""
+					else {
+						var gPrefix = "<"
+						for ( genericName : method.typeParameters)
+							gPrefix = gPrefix + genericName.simpleName + ","
+							
+						gPrefix.replaceAll(",$",">")
+					}
+				
+				}
+			
 				//----If the method is outside the annotatedClass then we have to implement its class or use its static call
-				var callObjectProvider = method.simpleName
+				var callObjectProvider = genericPrefix + method.simpleName
 				if (method.declaringType != annotatedClass && accessibleClasses.contains(method.declaringType))
 				{
 					if (method.isStatic) {
-						callObjectProvider = method.declaringType.qualifiedName + "." + method.simpleName
+						callObjectProvider = method.declaringType.qualifiedName + "." + callObjectProvider
 					}
 					else
 					{   
-						callObjectProvider = "(new "+ method.declaringType.qualifiedName + "())." + method.simpleName
+						callObjectProvider = "(new "+ method.declaringType.qualifiedName + "())." + callObjectProvider 
 						
 					}
 				}
+				else
+					if (! method.isStatic) callObjectProvider = "this."+ callObjectProvider
+					
 				val callObjectProviderF = callObjectProvider
 				
 				for (exprAffectation : xContainer.get(method.simpleName)) {
@@ -511,12 +529,34 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 					annotatedClass.addMethod(method.simpleName) [
 						val xMethod = it
+						method.typeParameters.forEach[
+							if (it.upperBounds.size == 1 && it.upperBounds.last.simpleName == "Object" )
+								xMethod.addTypeParameter(it.simpleName)
+							else
+								xMethod.addTypeParameter(it.simpleName, it.upperBounds)
+						]
 						static = method.static
-						val containerType = exprAffectation.getContainerClassName.getComplexTypeRef(context)
+						val containerTypeString = exprAffectation.getContainerClassName
+						val containerType = containerTypeString.getComplexTypeRef(context)
+						val parentCast = { //TODO : fire me ... I'm too ugly
+							 if ( genericPrefix.empty) ""
+							 else  	containerTypeString + " pparent  = (" + containerTypeString + ") parent; p" 
+						}
+						
 						var oper = exprAffectation.methodAffectation
+						var operLink = "{@link " + containerType.name + "}"
 						if (!oper.trim.empty) {
-							//---We have a method to insert the new object in the container
-							oper = "parent." + oper + "(obj);"
+							if (oper.substring(0,1) == "@") {
+								//---the builder have a method to insert the new object in the container
+								val mName = oper.substring(1)
+								operLink = "{@link " + annotatedClass.qualifiedName + "#" + mName + "}" 
+								oper = mName + "(parent, obj);"
+							}
+							else {
+								//---The container have a method to insert the new object in the container
+								operLink = "{@link " + containerType.name + "} using " + oper 
+								oper = parentCast + "parent." + oper + "(obj);"
+							}
 							addParameter("parent", containerType)
 						}
 						else {
@@ -529,43 +569,45 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 									method.simpleName)
 							}
 						}
-						method.parameters.forEach[xMethod.addParameter(simpleName + "_" , type)]
 						visibility = Visibility::PUBLIC
-						returnType = method.returnType
-						addParameter("init", Procedures$Procedure1.newTypeReference(returnType))
 						var paramsString = ""
 						var paramTypesString = ""
 						for (param : method.parameters) {
 							var paramName =  param.simpleName + "_"
+							xMethod.addParameter(paramName, param.type)
 							if (paramsString.nullOrEmpty) {
-								paramsString = paramName
+								paramsString = "(" + param.type.simpleName + ")" + paramName 
 								paramTypesString = param.type.name
 							} else {
-								paramsString = paramsString + "," + paramName
+								paramsString = paramsString + ",(" + param.type.simpleName + ")" + paramName
 								paramTypesString = paramTypesString + "," + param.type.name
 							}
 
 						}
+						returnType = method.returnType
+						addParameter("init", Procedures$Procedure1.newTypeReference(returnType))
+
+						val expContainer = operLink //exprAffectation.replaceFirst("\\.\\.", " object with " + operLink + ".") 
+
 						val paramString = paramsString
 						val operOrNothing = oper
 						body = [
 							'''
-								«method.returnType» _obj = «callObjectProviderF»(«paramString»);
-								final «method.returnType» obj = org.eclipse.xtext.xbase.lib.ObjectExtensions.
+								«method.returnType.simpleName» _obj = «callObjectProviderF»(«paramString»);
+								final «method.returnType.simpleName» obj = org.eclipse.xtext.xbase.lib.ObjectExtensions.
 																<«method.returnType»>operator_doubleArrow(_obj, init);
 								«operOrNothing»							
 								return (obj);
 							''']
-						docComment = "Insert a new " + method.returnType + "[...] instance inside a " +
-							exprAffectation.replaceFirst("\\.\\.", " object with '") + "'."
-						docComment = docComment + "<br>See {@link " + annotatedClass.compilationUnit.packageName + "."+
-						annotatedClass.compilationUnit.simpleName + "}"
+						docComment = "Insert a new " +  method.returnType.name + "[...] instance inside a " + expContainer + "."
+						docComment = docComment + " (See {@link " + annotatedClass.compilationUnit.packageName + "."+
+						annotatedClass.compilationUnit.simpleName + "})"
 						docComment = docComment + "\n@param parent is the container/receiver"
 						docComment = docComment + "\n@param init is the closure builder where inserts can be added "
 						docComment = docComment + "\n@return the new created " + method.returnType +
 							"[...] Object"
 						docComment = docComment + " with {@link "+ method.declaringType.qualifiedName +"#"  + method.simpleName + "(" + paramTypesString + ")}"
-						docComment = docComment + "\n@see " + method.returnType.name
+						docComment = {docComment + "\n@see " + method.returnType.name}.toHtml
 						setExceptions(method.exceptions)
 					//---Todo check the generated code and follow up errors to xtend file Bug 408083
 					]
@@ -581,7 +623,7 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 			}
 		}
-
+	
 		/**Gererate all the desired methods defined with XtendTree */
 		protected def generateXTreeNodeFromConstructors(MethodDeclaration method, MutableClassDeclaration annotatedClass,
 			extension TransformationContext context) throws DocXException {
@@ -602,11 +644,11 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 				}
 				if ( isIncluded == null  )
 					method.error(annotatedClass, context,
-						"With " + IXtendNode::usingConstructors + " only one varArg 'Object...' parameter can be declared (or none)" )
+						"With " + IXtendNode::usingConstructors + " only one varArgs 'Object...' parameter can be declared (or none)" )
 
 				if (method.returnType == Object.newTypeReference())
 					method.error (annotatedClass, context, method.simpleName + 
-						"return type cannot be inferred (or Object is forbidden) : specify the method return type"
+						" return type cannot be inferred (or Object is forbidden) : specify the method return type"
 					)
 					
 
@@ -631,14 +673,23 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 
 					var almostOne = false
 					for (constructor : classT.declaredConstructors) {
-
+						
 						var TypeReference firstParam 
-						if (!constructor.parameters.isEmpty) 
+						
+						var keepThisConstructor = true
+						if (!constructor.parameters.isEmpty){ 
+							
 							firstParam = constructor.parameters.head.type
 							
+							if(!isIncluded && constructor.isVarArgs) {
+								//IXtendNode::usingConstructors + " with _MethodNode(Object...varArgs) " +
+								//"cannot duplicate a constructor having a varArgs parameter" )
+								keepThisConstructor = false
+							}
+						}
 						var containers = <TypeReference,String>newHashMap()
 						
-						if (constructor.visibility == Visibility::PUBLIC) {
+						if (keepThisConstructor && constructor.visibility == Visibility::PUBLIC) {
 							sillyLog = method.simpleName + " inside the constructor : " + constructor.toString
 
 							// ---check if the container is well designed to contain our method
@@ -729,15 +780,32 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 				
 				val operMethod = containers.get(container)
 				annotatedClass.addMethod(method.simpleName) [
+					val xMethod = it
 					static = method.static
+					
+					//--Check for generic type
+					method.typeParameters.forEach[
+						if (it.upperBounds.size == 1 && it.upperBounds.last.simpleName == "Object" )
+							xMethod.addTypeParameter(it.simpleName)
+						else
+							xMethod.addTypeParameter(it.simpleName, it.upperBounds)
+					]
 					var paramsString = ""
 					var paramTypesString = ""
 					var operAff = ""
 					var operAffText=""
 					if (!operMethod.trim.empty) {
-						//---We have a method to insert the new object in the container
-						operAff = "parent." + operMethod + "(obj);"
-						operAffText = " with " + operMethod + ""
+						if (operMethod.substring(0,1) == "@") {
+							//---the builder have a method to insert the new object in the container
+							val mName = operMethod.substring(1)
+							operAffText = " with {@link " + annotatedClass.qualifiedName + "#" + mName + "}" 
+							operAff = mName + "(parent, obj);"
+						}
+						else {
+							//---We have a method to insert the new object in the container
+							operAff = "parent." + operMethod + "(obj);"
+							operAffText = " with " + operMethod 
+						}
 						addParameter("parent", container)
 					}
 
@@ -746,41 +814,51 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 					for (parameter : constructor.parameters) {
 						var paramName =parameter.simpleName  + "_"  
 						if (paramsString.nullOrEmpty) {
-							paramsString = paramName
+							paramsString =  "(" + parameter.type.simpleName + ")" +paramName
 							paramTypesString = parameter.type.name
 						} else {
-							paramsString = paramsString + "," + paramName
+							paramsString = paramsString + ",(" + parameter.type.simpleName + ")"  + paramName
 							paramTypesString = paramTypesString + "," + parameter.type.name
 						}
-						addParameter(paramName, parameter.type)
+						//---Not Generic type or Generic type parameter
+						if (parameter.type.actualTypeArguments.empty)
+							addParameter(paramName, parameter.type)
+						else {
+							//TODO : something ...
+							addParameter(paramName, parameter.type)
+							
+						}
 					}
 				
+
 
 					visibility = Visibility::PUBLIC
 					returnType = method.returnType
 					addParameter("init", Procedures$Procedure1.newTypeReference(returnType))
-					val oper = "new " + method.returnType.simpleName + " (" + paramsString + ")"
+					
+					val oper = "new " + method.returnType.simpleName +" (" + paramsString + ")"
 					val operOrNothing = operAff
 					val operTextOrNothing = operAffText
 					body = [
 						'''
-							«method.returnType» _obj = «oper»;
-							final «method.returnType» obj = org.eclipse.xtext.xbase.lib.ObjectExtensions.
+							«method.returnType.simpleName» _obj = «oper»;
+							final «method.returnType.simpleName» obj = org.eclipse.xtext.xbase.lib.ObjectExtensions.
 															<«method.returnType»>operator_doubleArrow(_obj, init);
 							«operOrNothing»
 							return (obj);
 						''']
-					docComment = "Create a new " + method.returnType + "[...] instance associated to a " +
-						container.simpleName + operTextOrNothing + "."
-					docComment = docComment + " See {@link " + annotatedClass.compilationUnit.packageName +
-												"." + annotatedClass.compilationUnit.simpleName + "}"
+					docComment = "Create a new " + method.returnType.name + "[...] instance associated to a " +
+						container.name + operTextOrNothing + "."
+					docComment = docComment + " (See: {@link " + annotatedClass.compilationUnit.packageName +
+												"." + annotatedClass.compilationUnit.simpleName + "})"
 					if (operAff != "") docComment = docComment + "\n@param parent is the receiver"
 					docComment = docComment + "\n@param init is the closure builder where inserts can be added "
 					docComment = docComment + "\n@return the new created {@link "+ method.returnType.name + "#" + 
 								method.returnType.simpleName +"(" + paramTypesString + ") " + method.returnType + "[...]} Object"
-					docComment = docComment + "\n@see " + container.name
+					docComment = {docComment + "\n@see " + container.name}.toHtml
 					//docComment = docComment + "\n@see " + method.returnType.name + "#Constructor(" +
 						//paramTypesString + ")"
+					docComment = {docComment + "\n@see " + container.name}.toHtml
 					setExceptions(method.exceptions)
 				//---Todo check the ability to get the constructors param name (java 8)
 				]
@@ -843,9 +921,12 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 			val mainTypeName = typeString.replaceFirst("\\<.+", "").trim
 
 			if (! xType.containsKey(mainTypeName))
-				throw new DocXException(
-					mainTypeName + " is not a valid class name for a XtendNode. One method at least must return it : " +
-						typeString)
+				if (mainTypeName.matches("[A-Z]") )
+					return newWildcardTypeReference()		//TODO : I wanna a type parameter here not a wildcard
+				else
+					throw new DocXException(
+						mainTypeName + " is not a valid class name for a XtendNode. One method at least must return it : " +
+							typeString)
 
 			var typeRef = xType.get(mainTypeName)
 
@@ -886,6 +967,21 @@ class XtendTreeProcessor extends AbstractClassProcessor {
 		protected def getMethodAffectation(String lineXtree) {
 			lineXtree.replaceFirst(".*\\.\\.", "").trim
 		}
+
+		/**html for javadoc ... reduced escape function*/
+		def toHtml(String s) {
+			var sb = new StringBuffer();
+			for (c : s.toCharArray) {
+				switch (c as int) {
+					case 60: sb.append("&lt;")
+					case 62: sb.append("&gt;")
+					default: sb.append(c)
+				}
+			}
+			return sb.toString
+		}
+	
+
 
 	}
 

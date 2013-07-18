@@ -86,11 +86,12 @@ The goal, thanks to Xtend extensions and closure builder, is to be able to have 
 <br/>
 <p>
 <h3>Method annotation @XtendNode</h3>
-	<br/>
+<br/>
   The method annotated with @XtendNode is a node of the Xtend Tree. 
   <br/><br/>
   A node can describe a container if <i>"inserts"</i> element describes a way to insert other nodes (identified by their method's name).
-  The way these nodes will be inserted is indicated before the colon. 
+  The way these nodes will be inserted is indicated before the colon. The prefix '@' indicates that the method is a method of 
+  the annotated class.
   The nodes that can be inserted are listed, using their method's name, after the colon.
   <br/><br/>A node is an insert for one or more containers or only here to define a generic type container. 
   <br/><b>The return type of the method's node (inferred or not) is the container.</b> 
@@ -111,12 +112,12 @@ The goal, thanks to Xtend extensions and closure builder, is to be able to have 
   <b>Important:</b> If "usingConstructors" flag is not set then the method body is in charge for the creation of the object 
   (using a factory ... or one of its constructors). This is the better choice as it gives a simple access to object creation and
   specific adaptation.
- </li> 
+  </li> 
   
   <br/><br/>
   The method visibility should be "protected" as this method should not be visible outside this class. The "duplicated"
   methods generated from this methods are always public. 
-  The <i>Element "Container"</i> can define the container type (instead )
+  The <i>Element "Container"</i> can define the container type (not useful now)
 </p>
 <p>
 <a href="tutodocxtend.html">Next : Tutorial</a>
