@@ -2,3 +2,4 @@ org.mv.docxtend
 org.mv.docxtend.eclipse.e4
 org.mv.docxtend.eclipse.jface
 org.mv.docxtend.eclipse.swt
+org.mv.docxtend.tools.wizards
