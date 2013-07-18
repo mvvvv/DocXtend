@@ -227,17 +227,18 @@ Inside the test file <strong>SwingFrame</strong>, remove the two extension value
 <br/>
 <h3 id="Part5">5 - How to use a dispatch method</h3>
 <br/>
-In some complex cases, and to avoid having too many duplicated methods, it can be useful to use a dispatch method.
+For some complex cases, and to avoid having too many duplicated methods, it can be useful to use a dispatch method.
 <br/><br/>
 
 Inside the test file <strong>SwingMenuBuilder</strong>, add two dispatch methods  named &quot;dispatchContainer&quot; and one dummy method named &quot;xDummyContainer&quot;:<br/><br/>
 <p class=code>
-	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def duplicate </em>dispatchContainer (JMenuBar parent, JMenuItem){ parent.add(JMenuItem) }<br/>
-	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def duplicate </em>dispatchContainer (JMenu parent, JMenuItem){ parent.add(JMenuItem) }<br/></br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def dispatch </em>dispatchContainer (Object parent, JMenuItem node){ throw new IllegalAccessError ("Not here !!") }<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def dispatch </em>dispatchContainer (JMenuBar parent, JMenuItem node){ parent.add(node) }<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<em>protected def dispatch </em>dispatchContainer (JMenu parent, JMenuItem node){ parent.add(node) }<br/></br>
 	&nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts =<strong>"@dispatchContainer :_JMenuItem"</strong>) 
 	 <em>protected def </em> Object _xDummyContainer(){}
 </p>
-Then replace the &quot;_JMenu&quot;  and &quot;_JMenuBar&quot; methods :
+Then replace the &quot;_JMenu&quot;  and &quot;_JMenuBar&quot; methods  with this:
 <p class="code">  
 
 	 &nbsp;&nbsp;&nbsp;&nbsp;<i>@XtendNode</i> (inserts=<strong>"add:_JMenu"</strong>) 
@@ -246,6 +247,7 @@ Then replace the &quot;_JMenu&quot;  and &quot;_JMenuBar&quot; methods :
 	 <em>protected def </em>  _JMenu(){<em>new</em> JMenu}<br/>
 	 }
 </p>
-The &quot;@&quot; prefix indicates to use a method of the builder instead of a method of the parent<br/>
+The &quot;@&quot; prefix indicates to use a method of the builder instead of a method of the parent. This method must have two parameters : the &quot;parent/container/receiver&quot; then the node. <br>
+<br>If you're working with static methods, then add <em>static</em> keyword before every method's definition.<br><br><br/>
 </body>
 </html>
