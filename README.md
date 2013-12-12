@@ -1,3 +1,5 @@
+<h1> !!! CANNOT BE USED WITH XTEND 2.50 !!!!</h1>
+
 <b>Xtend active annotations which helps to create object builders</b>
 
 <p>org.mv.docxtend_ is the feature. Do an "export deployabe Feature" to create the p2 update site.</p>
