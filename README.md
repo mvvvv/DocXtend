@@ -16,5 +16,4 @@ org.mv.alpha</a> is a sample using the eclipse builders </p>
 
 <p>Let me know if it's usefull</p>
 
-<p>see also <a href="http://www.matthieu-vidal.com">www.matthieu-vidal.com</a></p>
 
